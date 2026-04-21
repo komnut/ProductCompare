@@ -129,6 +129,17 @@ body {
     align-items: end;
 }
 
+.form-error {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 0.55rem 0.65rem;
+    border-radius: 10px;
+    color: #8b2f2a;
+    background: #ffe5e2;
+    border: 1px solid #f3b7b0;
+    font-size: 0.9rem;
+}
+
 label {
     display: grid;
     gap: 0.18rem;
@@ -191,6 +202,14 @@ label {
     padding: 0.45rem 0.35rem;
 }
 
+.result-row-best {
+    background: color-mix(in srgb, var(--pc-best-bg) 55%, transparent);
+}
+
+.result-row-best .price-unit {
+    color: #834c35;
+}
+
 .price-unit {
     font-weight: 700;
 }
@@ -246,6 +265,16 @@ label {
 
 :root[data-theme="dark"] .status-best,
 :root[data-theme="dark"] .status-over {
+    color: #ffd8bf;
+}
+
+:root[data-theme="dark"] .form-error {
+    color: #ffd8cf;
+    background: #563330;
+    border-color: #83514a;
+}
+
+:root[data-theme="dark"] .result-row-best .price-unit {
     color: #ffd8bf;
 }
 

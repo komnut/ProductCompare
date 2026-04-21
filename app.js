@@ -10,6 +10,10 @@ const searchInput = document.getElementById("searchInput");
 const emptyTemplate = document.getElementById("emptyTemplate");
 const themeToggle = document.getElementById("themeToggle");
 const themeColorMeta = document.getElementById("themeColorMeta");
+const formError = document.getElementById("formError");
+const productInput = document.getElementById("product");
+const priceInput = document.getElementById("price");
+const amountInput = document.getElementById("amount");
 
 let items = loadItems();
 let keyword = "";
@@ -35,22 +39,27 @@ if (themeToggle) {
 form.addEventListener("submit", (event) => {
     event.preventDefault();
 
+    hideFormError();
+
     const payload = new FormData(form);
     const amount = Number(payload.get("amount"));
     const price = Number(payload.get("price"));
+    const product = String(payload.get("product") || "").trim();
+
+    const validationError = validateFormInput({ product, price, amount });
+    if (validationError) {
+        showFormError(validationError.message);
+        validationError.input?.focus();
+        return;
+    }
 
     const newItem = {
         id: crypto.randomUUID(),
-        product: String(payload.get("product")).trim(),
+        product,
         price,
         amount,
-        unitPrice: Number((price / amount).toFixed(4)),
+        unitPrice: computeUnitPrice(price, amount),
     };
-
-    if (!newItem.product || !Number.isFinite(newItem.price) || newItem.price <= 0 || !Number.isFinite(newItem.amount) || newItem.amount <= 0) {
-        alert("กรอกข้อมูล ชื่อสินค้า ราคา และปริมาณ ให้ถูกต้อง");
-        return;
-    }
 
     items.unshift(newItem);
     persist();
@@ -98,7 +107,7 @@ function makeSample(product, price, amount) {
         product,
         price,
         amount,
-        unitPrice: Number((price / amount).toFixed(4)),
+        unitPrice: computeUnitPrice(price, amount),
     };
 }
 
@@ -118,7 +127,12 @@ function render() {
         return;
     }
 
-    const bestItem = viewItems.reduce((best, item) => {
+    const rows = [...viewItems].map((item) => ({
+        ...item,
+        unitPrice: computeUnitPrice(item.price, item.amount),
+    }));
+
+    const bestItem = rows.reduce((best, item) => {
         if (!best || item.unitPrice < best.unitPrice) {
             return item;
         }
@@ -127,7 +141,7 @@ function render() {
 
     const minUnitPrice = bestItem ? bestItem.unitPrice : 0;
 
-    const rows = [...viewItems].sort((a, b) => {
+    rows.sort((a, b) => {
         return a.unitPrice - b.unitPrice;
     });
 
@@ -137,7 +151,7 @@ function render() {
             const isBest = Boolean(bestItem && item.id === bestItem.id);
 
             return `
-        <tr>
+        <tr class="${isBest ? "result-row-best" : ""}">
                     <td>
             <strong>${escapeHtml(item.product)}</strong>
           </td>
@@ -188,9 +202,7 @@ function loadItems() {
             .map((item) => {
                 const price = Number(item.price);
                 const amount = Number(item.amount);
-                const unitPrice = Number.isFinite(Number(item.unitPrice))
-                    ? Number(item.unitPrice)
-                    : Number((price / amount).toFixed(4));
+                const unitPrice = computeUnitPrice(price, amount);
 
                 return {
                     id: String(item.id || crypto.randomUUID()),
@@ -212,6 +224,48 @@ function formatCurrency(value) {
         currency: "THB",
         maximumFractionDigits: 2,
     }).format(value);
+}
+
+function computeUnitPrice(price, amount) {
+    if (!Number.isFinite(price) || !Number.isFinite(amount) || amount <= 0) {
+        return 0;
+    }
+
+    return price / amount;
+}
+
+function validateFormInput({ product, price, amount }) {
+    if (!product) {
+        return { message: "กรุณากรอกชื่อสินค้า", input: productInput };
+    }
+
+    if (!Number.isFinite(price) || price <= 0) {
+        return { message: "กรุณากรอกราคาเป็นตัวเลขมากกว่า 0", input: priceInput };
+    }
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+        return { message: "กรุณากรอกปริมาณเป็นตัวเลขมากกว่า 0", input: amountInput };
+    }
+
+    return null;
+}
+
+function showFormError(message) {
+    if (!formError) {
+        return;
+    }
+
+    formError.hidden = false;
+    formError.textContent = message;
+}
+
+function hideFormError() {
+    if (!formError) {
+        return;
+    }
+
+    formError.hidden = true;
+    formError.textContent = "";
 }
 
 function formatQuantity(amount) {

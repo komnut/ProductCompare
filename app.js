@@ -170,19 +170,19 @@ function render() {
 
             return `
         <tr class="${isBest ? "result-row-best" : ""}">
-                    <td>
+                    <td data-label="สินค้า">
             <strong>${escapeHtml(item.product)}</strong>
           </td>
-                    <td>${formatCurrency(item.price)}</td>
-                    <td>${formatQuantity(item.amount)}</td>
-                        <td class="price-unit">${formatCurrency(item.unitPrice)}</td>
-                    <td>
+                    <td data-label="ราคา">${formatCurrency(item.price)}</td>
+                    <td data-label="จำนวน">${formatQuantity(item.amount)}</td>
+                        <td data-label="บาท/หน่วย" class="price-unit">${formatCurrency(item.unitPrice)}</td>
+                    <td data-label="สถานะ">
             ${isBest
                     ? `<span class="status-text status-best">⭐ คุ้มสุด</span>`
                     : `<span class="status-text status-over">แพงกว่า ${formatCurrency(diffPerPack)}</span>`
                 }
           </td>
-                    <td>
+                    <td data-label="การจัดการ">
                         <button class="delete-btn" type="button" data-id="${item.id}">ลบ</button>
           </td>
         </tr>

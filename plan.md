@@ -9,7 +9,7 @@
 - Edit and delete each item
 - [x] Validate inputs and show friendly errors
 - Persist data in local storage so refresh does not lose entries
-- Mobile-first layout for in-store usage
+- [x] Mobile-first layout for in-store usage
 - Fast load and responsive interactions
 
 ## Nice to Have

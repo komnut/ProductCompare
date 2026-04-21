@@ -118,6 +118,7 @@ body {
     flex: 1;
     display: grid;
     gap: 1rem;
+    min-width: 0;
     padding-bottom: 1.5rem;
 }
 
@@ -126,6 +127,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 0.6rem;
+    width: 100%;
     padding: 0.75rem 0;
     position: sticky;
     top: 0;
@@ -141,6 +144,7 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    min-width: 0;
 }
 
 .brand-icon {
@@ -151,6 +155,7 @@ body {
     font-weight: 800;
     font-size: 1.1rem;
     letter-spacing: -0.02em;
+    white-space: nowrap;
 }
 
 .version-badge {
@@ -169,6 +174,7 @@ body {
     justify-content: center;
     width: 38px;
     height: 38px;
+    flex-shrink: 0;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     background: var(--surface);
@@ -250,6 +256,7 @@ body {
     background: var(--surface);
     border: 1px solid var(--border);
     box-shadow: var(--shadow-md);
+    min-width: 0;
 }
 
 .panel-header {
@@ -466,12 +473,14 @@ body {
 /* --- Table --- */
 .table-container {
     overflow-x: auto;
+    max-width: 100%;
     border-radius: var(--radius-sm);
     -webkit-overflow-scrolling: touch;
 }
 
 .compare-table {
     width: 100%;
+    min-width: 720px;
     border-collapse: collapse;
     white-space: nowrap;
 }
@@ -594,6 +603,26 @@ body {
         padding: 0 0.65rem;
     }
 
+    .topbar {
+        padding-top: max(0.55rem, env(safe-area-inset-top));
+    }
+
+    .topbar-brand {
+        gap: 0.35rem;
+        max-width: calc(100% - 44px);
+    }
+
+    .brand-name {
+        font-size: 1rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .version-badge {
+        font-size: 0.62rem;
+        padding: 0.12rem 0.35rem;
+    }
+
     .entry-form {
         grid-template-columns: 1fr;
     }
@@ -608,6 +637,10 @@ body {
 
     .hero-banner {
         border-radius: 14px;
+    }
+
+    .hero-banner::after {
+        display: none;
     }
 
     .panel {
@@ -639,6 +672,16 @@ body {
     }
 
     .bg-blob-3 {
+        display: none;
+    }
+
+    .compare-table {
+        min-width: 640px;
+    }
+}
+
+@media (max-width: 430px) {
+    .version-badge {
         display: none;
     }
 }

@@ -4,16 +4,37 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>ProductCompare | เปรียบเทียบราคาสินค้าหน้าร้าน</title>
     <meta name="description"
         content="เว็บเปรียบเทียบราคาสินค้าระหว่างร้าน คำนวณราคาต่อหน่วย หาอันที่คุ้มที่สุดได้ทันที" />
     <meta id="themeColorMeta" name="theme-color" content="#FFDCDC" />
-    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="manifest" href="manifest.webmanifest" data-cache-bust="true" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700;800&display=swap"
         rel="stylesheet" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css" data-cache-bust="true" />
+
+    <script>
+        (() => {
+            const cacheBust = String(Date.now());
+
+            document.querySelectorAll("link[data-cache-bust='true']").forEach((link) => {
+                const href = link.getAttribute("href");
+                if (!href) {
+                    return;
+                }
+
+                const separator = href.includes("?") ? "&" : "?";
+                link.setAttribute("href", `${href}${separator}cb=${cacheBust}`);
+            });
+
+            window.__assetCacheBust = cacheBust;
+        })();
+    </script>
 </head>
 
 <body>
@@ -168,7 +189,16 @@
         </tr>
     </template>
 
-    <script src="app.js" defer></script>
+    <script>
+        (() => {
+            const script = document.createElement("script");
+            const cacheBust = window.__assetCacheBust || String(Date.now());
+
+            script.src = `app.js?cb=${cacheBust}`;
+            script.defer = true;
+            document.body.appendChild(script);
+        })();
+    </script>
 </body>
 
 </html>

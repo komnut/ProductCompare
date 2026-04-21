@@ -319,6 +319,7 @@ async function onShareImage() {
     }
 
     try {
+        await waitForCanvasFonts();
         const rows = getSortedRowsForShare();
         const imageBlob = await generateComparisonImage(rows);
 
@@ -342,6 +343,18 @@ async function onShareImage() {
     }
 }
 
+async function waitForCanvasFonts() {
+    if (!document.fonts || !document.fonts.ready) {
+        return;
+    }
+
+    try {
+        await document.fonts.ready;
+    } catch {
+        // Continue with fallback font if font loading fails.
+    }
+}
+
 function getSortedRowsForShare() {
     return [...items]
         .map((item) => ({
@@ -355,9 +368,11 @@ function getSortedRowsForShare() {
 function generateComparisonImage(rows) {
     const width = 1080;
     const rowHeight = 64;
-    const headerHeight = 170;
-    const footerHeight = 56;
-    const height = headerHeight + rows.length * rowHeight + footerHeight;
+    const topPadding = 36;
+    const tableHeaderHeight = 54;
+    const footerHeight = 64;
+    const bottomPadding = 18;
+    const height = topPadding + tableHeaderHeight + rows.length * rowHeight + bottomPadding + footerHeight;
     const best = rows[0] || null;
 
     const canvas = document.createElement("canvas");
@@ -371,17 +386,12 @@ function generateComparisonImage(rows) {
 
     ctx.fillStyle = "#fff4ec";
     ctx.fillRect(0, 0, width, height);
+    ctx.textBaseline = "top";
 
     ctx.fillStyle = "#fddcc4";
-    ctx.fillRect(40, 30, width - 80, 100);
+    ctx.fillRect(40, topPadding, width - 80, tableHeaderHeight);
 
-    ctx.fillStyle = "#4f342d";
-    ctx.font = "700 40px 'Noto Sans Thai', sans-serif";
-    ctx.fillText("ProductCompare", 68, 78);
-    ctx.font = "500 24px 'Noto Sans Thai', sans-serif";
-    ctx.fillText(`ผลเปรียบเทียบราคาต่อหน่วย · v${APP_VERSION}`, 68, 115);
-
-    const tableTop = 156;
+    const tableTop = topPadding + 14;
     ctx.fillStyle = "#6a5047";
     ctx.font = "700 22px 'Noto Sans Thai', sans-serif";
     ctx.fillText("สินค้า", 64, tableTop);
@@ -389,13 +399,16 @@ function generateComparisonImage(rows) {
     ctx.fillText("จำนวน", 645, tableTop);
     ctx.fillText("บาท/หน่วย", 785, tableTop);
 
+    const rowsTop = topPadding + tableHeaderHeight;
+
     rows.forEach((item, index) => {
-        const y = tableTop + 20 + index * rowHeight;
+        const rowTop = rowsTop + index * rowHeight;
+        const y = rowTop + 18;
         const isBest = Boolean(best && item.id === best.id);
 
         if (isBest) {
             ctx.fillStyle = "#ffe9d8";
-            ctx.fillRect(50, y - 33, width - 100, rowHeight - 8);
+            ctx.fillRect(50, rowTop + 4, width - 100, rowHeight - 8);
         }
 
         ctx.fillStyle = "#3c2c26";
@@ -410,13 +423,13 @@ function generateComparisonImage(rows) {
         if (isBest) {
             ctx.fillStyle = "#9a5d3f";
             ctx.font = "700 20px 'Noto Sans Thai', sans-serif";
-            ctx.fillText("คุ้มสุด", 955, y);
+            ctx.fillText("คุ้มสุด", 955, y + 2);
         }
     });
 
     ctx.fillStyle = "#6a5047";
     ctx.font = "500 19px 'Noto Sans Thai', sans-serif";
-    ctx.fillText(`อัปเดต ${new Date().toLocaleString("th-TH")}`, 64, height - 20);
+    ctx.fillText(`อัปเดต ${new Date().toLocaleString("th-TH")}`, 64, height - 38);
 
     return new Promise((resolve, reject) => {
         canvas.toBlob((blob) => {

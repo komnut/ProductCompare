@@ -11,6 +11,9 @@ const emptyTemplate = document.getElementById("emptyTemplate");
 const themeToggle = document.getElementById("themeToggle");
 const themeColorMeta = document.getElementById("themeColorMeta");
 const formError = document.getElementById("formError");
+const shareMessage = document.getElementById("shareMessage");
+const shareLinkBtn = document.getElementById("shareLinkBtn");
+const shareImageBtn = document.getElementById("shareImageBtn");
 const productInput = document.getElementById("product");
 const priceInput = document.getElementById("price");
 const amountInput = document.getElementById("amount");
@@ -25,6 +28,7 @@ if ("serviceWorker" in navigator) {
 }
 
 initTheme();
+hydrateItemsFromUrl();
 
 render();
 
@@ -34,6 +38,14 @@ if (themeToggle) {
         const nextTheme = currentTheme === "dark" ? "light" : "dark";
         applyTheme(nextTheme);
     });
+}
+
+if (shareLinkBtn) {
+    shareLinkBtn.addEventListener("click", onShareLink);
+}
+
+if (shareImageBtn) {
+    shareImageBtn.addEventListener("click", onShareImage);
 }
 
 form.addEventListener("submit", (event) => {
@@ -266,6 +278,252 @@ function hideFormError() {
 
     formError.hidden = true;
     formError.textContent = "";
+}
+
+async function onShareLink() {
+    if (!items.length) {
+        setShareMessage("ยังไม่มีรายการสำหรับแชร์");
+        return;
+    }
+
+    try {
+        const shareUrl = buildShareUrl(items);
+
+        if (navigator.share) {
+            await navigator.share({
+                title: "ProductCompare",
+                text: "เปรียบเทียบราคาสินค้าของฉัน",
+                url: shareUrl,
+            });
+            setShareMessage("แชร์ลิงก์เรียบร้อยแล้ว");
+            return;
+        }
+
+        await navigator.clipboard.writeText(shareUrl);
+        setShareMessage("คัดลอกลิงก์แล้ว");
+    } catch {
+        setShareMessage("แชร์ลิงก์ไม่สำเร็จ ลองใหม่อีกครั้ง");
+    }
+}
+
+async function onShareImage() {
+    if (!items.length) {
+        setShareMessage("ยังไม่มีรายการสำหรับแชร์");
+        return;
+    }
+
+    try {
+        const rows = getSortedRowsForShare();
+        const imageBlob = await generateComparisonImage(rows);
+
+        if (navigator.share && navigator.canShare) {
+            const file = new File([imageBlob], "product-compare.png", { type: "image/png" });
+            if (navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    title: "ProductCompare",
+                    text: "ผลเปรียบเทียบราคาสินค้า",
+                    files: [file],
+                });
+                setShareMessage("แชร์รูปเรียบร้อยแล้ว");
+                return;
+            }
+        }
+
+        downloadBlob(imageBlob, `product-compare-${Date.now()}.png`);
+        setShareMessage("ดาวน์โหลดรูปเรียบร้อยแล้ว");
+    } catch {
+        setShareMessage("สร้างรูปสำหรับแชร์ไม่สำเร็จ");
+    }
+}
+
+function getSortedRowsForShare() {
+    return [...items]
+        .map((item) => ({
+            ...item,
+            unitPrice: computeUnitPrice(item.price, item.amount),
+        }))
+        .sort((a, b) => a.unitPrice - b.unitPrice)
+        .slice(0, 12);
+}
+
+function generateComparisonImage(rows) {
+    const width = 1080;
+    const rowHeight = 64;
+    const headerHeight = 170;
+    const footerHeight = 56;
+    const height = headerHeight + rows.length * rowHeight + footerHeight;
+    const best = rows[0] || null;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+        throw new Error("Canvas not available");
+    }
+
+    ctx.fillStyle = "#fff4ec";
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.fillStyle = "#fddcc4";
+    ctx.fillRect(40, 30, width - 80, 100);
+
+    ctx.fillStyle = "#4f342d";
+    ctx.font = "700 40px 'Noto Sans Thai', sans-serif";
+    ctx.fillText("ProductCompare", 68, 78);
+    ctx.font = "500 24px 'Noto Sans Thai', sans-serif";
+    ctx.fillText("ผลเปรียบเทียบราคาต่อหน่วย", 68, 115);
+
+    const tableTop = 156;
+    ctx.fillStyle = "#6a5047";
+    ctx.font = "700 22px 'Noto Sans Thai', sans-serif";
+    ctx.fillText("สินค้า", 64, tableTop);
+    ctx.fillText("ราคา", 500, tableTop);
+    ctx.fillText("จำนวน", 645, tableTop);
+    ctx.fillText("บาท/หน่วย", 785, tableTop);
+
+    rows.forEach((item, index) => {
+        const y = tableTop + 20 + index * rowHeight;
+        const isBest = Boolean(best && item.id === best.id);
+
+        if (isBest) {
+            ctx.fillStyle = "#ffe9d8";
+            ctx.fillRect(50, y - 33, width - 100, rowHeight - 8);
+        }
+
+        ctx.fillStyle = "#3c2c26";
+        ctx.font = "600 24px 'Noto Sans Thai', sans-serif";
+        ctx.fillText(clampText(ctx, item.product, 28), 64, y);
+
+        ctx.font = "500 22px 'Noto Sans Thai', sans-serif";
+        ctx.fillText(formatCurrency(item.price), 500, y);
+        ctx.fillText(formatQuantity(item.amount), 645, y);
+        ctx.fillText(formatCurrency(item.unitPrice), 785, y);
+
+        if (isBest) {
+            ctx.fillStyle = "#9a5d3f";
+            ctx.font = "700 20px 'Noto Sans Thai', sans-serif";
+            ctx.fillText("คุ้มสุด", 955, y);
+        }
+    });
+
+    ctx.fillStyle = "#6a5047";
+    ctx.font = "500 19px 'Noto Sans Thai', sans-serif";
+    ctx.fillText(`อัปเดต ${new Date().toLocaleString("th-TH")}`, 64, height - 20);
+
+    return new Promise((resolve, reject) => {
+        canvas.toBlob((blob) => {
+            if (!blob) {
+                reject(new Error("Unable to create blob"));
+                return;
+            }
+
+            resolve(blob);
+        }, "image/png");
+    });
+}
+
+function clampText(ctx, text, maxChars) {
+    const value = String(text || "");
+    if (value.length <= maxChars) {
+        return value;
+    }
+
+    const trimmed = `${value.slice(0, Math.max(0, maxChars - 1))}…`;
+    while (ctx.measureText(trimmed).width > 410) {
+        return `${value.slice(0, Math.max(0, maxChars - 5))}…`;
+    }
+
+    return trimmed;
+}
+
+function downloadBlob(blob, filename) {
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+}
+
+function buildShareUrl(sourceItems) {
+    const payload = sourceItems.map((item) => ({
+        product: String(item.product || "").trim(),
+        price: Number(item.price),
+        amount: Number(item.amount),
+    }));
+
+    const encoded = encodeForUrl(JSON.stringify(payload));
+    const shareUrl = new URL(window.location.href);
+    shareUrl.searchParams.set("data", encoded);
+    return shareUrl.toString();
+}
+
+function hydrateItemsFromUrl() {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const raw = params.get("data");
+        if (!raw) {
+            return;
+        }
+
+        const decoded = decodeFromUrl(raw);
+        const parsed = JSON.parse(decoded);
+        if (!Array.isArray(parsed) || !parsed.length) {
+            return;
+        }
+
+        const imported = parsed
+            .map((item) => {
+                const product = String(item.product || "").trim();
+                const price = Number(item.price);
+                const amount = Number(item.amount);
+                const unitPrice = computeUnitPrice(price, amount);
+
+                return {
+                    id: crypto.randomUUID(),
+                    product,
+                    price,
+                    amount,
+                    unitPrice,
+                };
+            })
+            .filter((item) => item.product && item.price > 0 && item.amount > 0);
+
+        if (!imported.length) {
+            return;
+        }
+
+        items = imported;
+        persist();
+        setShareMessage("โหลดรายการจากลิงก์เรียบร้อยแล้ว");
+
+        const cleanUrl = new URL(window.location.href);
+        cleanUrl.searchParams.delete("data");
+        history.replaceState(null, "", cleanUrl.toString());
+    } catch {
+        setShareMessage("ลิงก์ที่เปิดมาไม่ถูกต้อง");
+    }
+}
+
+function encodeForUrl(value) {
+    return btoa(unescape(encodeURIComponent(value)));
+}
+
+function decodeFromUrl(value) {
+    return decodeURIComponent(escape(atob(value)));
+}
+
+function setShareMessage(message) {
+    if (!shareMessage) {
+        return;
+    }
+
+    shareMessage.hidden = false;
+    shareMessage.textContent = message;
 }
 
 function formatQuantity(amount) {

@@ -73,9 +73,17 @@
         <section class="card results-card border-0" aria-labelledby="result-title">
             <div class="results-topbar">
                 <h2 id="result-title">ผลการเปรียบเทียบ</h2>
-                <input id="searchInput" class="form-control" type="search" placeholder="ค้นหาชื่อสินค้า"
-                    aria-label="ค้นหารายการ" />
+                <div class="results-actions">
+                    <button id="shareLinkBtn" class="btn btn-outline-secondary btn-sm btn-ghost"
+                        type="button">แชร์ลิงก์</button>
+                    <button id="shareImageBtn" class="btn btn-outline-secondary btn-sm btn-ghost"
+                        type="button">แชร์รูป</button>
+                    <input id="searchInput" class="form-control" type="search" placeholder="ค้นหาชื่อสินค้า"
+                        aria-label="ค้นหารายการ" />
+                </div>
             </div>
+
+            <p id="shareMessage" class="share-message" aria-live="polite" hidden></p>
 
             <div id="summary" class="summary"></div>
 

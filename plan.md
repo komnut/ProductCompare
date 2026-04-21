@@ -18,7 +18,7 @@
 - Multi-pack support (for example 3 x 250ml)
 - Discount and promo calculator (percent off, buy X get Y)
 - Scan barcode to prefill product info
-- Share comparison as image or link
+- [x] Share comparison as image or link
 - Import/export data (CSV or JSON)
 - Price history and trend charts
 - Category tagging and filtering

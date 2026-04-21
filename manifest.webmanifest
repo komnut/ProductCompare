@@ -2,12 +2,13 @@
     "name": "ProductCompare",
     "short_name": "PCompare",
     "description": "เว็บเปรียบเทียบราคาสินค้าแบบเร็วสำหรับใช้งานตอนเดินซื้อของ",
+    "version": "2.0.0",
     "lang": "th",
     "start_url": "./",
     "scope": "./",
     "display": "standalone",
     "orientation": "portrait",
-    "background_color": "#FFF2EB",
+    "background_color": "#FDF6F0",
     "theme_color": "#FFDCDC",
     "icons": [
         {

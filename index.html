@@ -13,102 +13,157 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700;800&display=swap"
         rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
     <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-    <div class="bg-shape bg-shape-1" aria-hidden="true"></div>
-    <div class="bg-shape bg-shape-2" aria-hidden="true"></div>
+    <div class="bg-blob bg-blob-1" aria-hidden="true"></div>
+    <div class="bg-blob bg-blob-2" aria-hidden="true"></div>
+    <div class="bg-blob bg-blob-3" aria-hidden="true"></div>
 
-    <main class="app-shell container">
-        <header class="hero">
-            <div class="hero-top">
-                <p class="eyebrow">Shopping Helper</p>
-                <button id="themeToggle" class="btn btn-outline-secondary btn-sm btn-theme" type="button"
-                    aria-pressed="false">โหมดมืด</button>
+    <div class="app-wrapper">
+        <nav class="topbar">
+            <div class="topbar-brand">
+                <span class="brand-icon" aria-hidden="true">⚖️</span>
+                <span class="brand-name">ProductCompare</span>
+                <span id="versionBadge" class="version-badge">v2.0.0</span>
             </div>
-            <h1>เปรียบเทียบราคาสินค้าได้ทันทีตอนเดินซื้อของ</h1>
-            <p class="hero-subtitle">
-                กรอกข้อมูลสินค้า ระบบจะคำนวณราคาต่อหน่วยให้อัตโนมัติและไฮไลต์ตัวเลือกที่คุ้มที่สุดในรอบนี้
-            </p>
-        </header>
+            <button id="themeToggle" class="icon-btn" type="button" aria-label="สลับธีม" aria-pressed="false">
+                <svg id="themeIconSun" class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5" />
+                    <line x1="12" y1="1" x2="12" y2="3" />
+                    <line x1="12" y1="21" x2="12" y2="23" />
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                    <line x1="1" y1="12" x2="3" y2="12" />
+                    <line x1="21" y1="12" x2="23" y2="12" />
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                </svg>
+                <svg id="themeIconMoon" class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    style="display:none">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+            </button>
+        </nav>
 
-        <section class="card form-card border-0" aria-labelledby="entry-title">
-            <div class="card-header">
-                <h2 id="entry-title">เพิ่มรายการเปรียบเทียบ</h2>
-                <button id="sampleBtn" class="btn btn-outline-secondary btn-sm btn-ghost"
-                    type="button">ใส่ข้อมูลตัวอย่าง</button>
-            </div>
+        <main class="main-content">
+            <header class="hero-banner">
+                <h1 class="hero-title">เปรียบเทียบราคาสินค้า<br /><span
+                        class="hero-highlight">หาตัวเลือกที่คุ้มที่สุด</span></h1>
+                <p class="hero-desc">กรอกข้อมูลสินค้า ระบบจะคำนวณราคาต่อหน่วยให้อัตโนมัติและไฮไลต์ตัวเลือกที่คุ้มที่สุด
+                </p>
+            </header>
 
-            <form id="compareForm" class="form-grid">
-                <p id="formError" class="form-error" role="alert" aria-live="polite" hidden></p>
-
-                <label>
-                    ชื่อสินค้า
-                    <input id="product" name="product" class="form-control" type="text" placeholder="เช่น น้ำดื่ม"
-                        required />
-                </label>
-
-                <label>
-                    ราคา (บาท)
-                    <input id="price" name="price" class="form-control" type="number" min="0.01" step="0.01"
-                        placeholder="45" required />
-                </label>
-
-                <label>
-                    ปริมาณ
-                    <input id="amount" name="amount" class="form-control" type="number" min="0.01" step="0.01"
-                        placeholder="เช่น 1500 หรือ 1.5" required />
-                </label>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">เพิ่มรายการ</button>
-                    <button id="clearBtn" type="button" class="btn btn-outline-danger">ล้างทั้งหมด</button>
+            <section class="panel panel-form" aria-labelledby="entry-title">
+                <div class="panel-header">
+                    <h2 id="entry-title" class="panel-title">
+                        <span class="panel-icon" aria-hidden="true">📝</span>
+                        เพิ่มรายการ
+                    </h2>
+                    <button id="sampleBtn" class="ghost-btn" type="button">ใส่ตัวอย่าง</button>
                 </div>
-            </form>
-        </section>
 
-        <section class="card results-card border-0" aria-labelledby="result-title">
-            <div class="results-topbar">
-                <h2 id="result-title">ผลการเปรียบเทียบ</h2>
-                <div class="results-actions">
-                    <button id="shareLinkBtn" class="btn btn-outline-secondary btn-sm btn-ghost"
-                        type="button">แชร์ลิงก์</button>
-                    <button id="shareImageBtn" class="btn btn-outline-secondary btn-sm btn-ghost"
-                        type="button">แชร์รูป</button>
-                    <input id="searchInput" class="form-control" type="search" placeholder="ค้นหาชื่อสินค้า"
-                        aria-label="ค้นหารายการ" />
+                <form id="compareForm" class="entry-form">
+                    <p id="formError" class="form-error" role="alert" aria-live="polite" hidden></p>
+
+                    <div class="field">
+                        <label for="product">ชื่อสินค้า</label>
+                        <input id="product" name="product" type="text" placeholder="เช่น น้ำดื่ม" required />
+                    </div>
+
+                    <div class="field">
+                        <label for="price">ราคา (บาท)</label>
+                        <input id="price" name="price" type="number" min="0.01" step="0.01" placeholder="45" required />
+                    </div>
+
+                    <div class="field">
+                        <label for="amount">ปริมาณ</label>
+                        <input id="amount" name="amount" type="number" min="0.01" step="0.01"
+                            placeholder="เช่น 1500 หรือ 1.5" required />
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary-action">เพิ่มรายการ</button>
+                        <button id="clearBtn" type="button" class="btn-danger-action">ล้างทั้งหมด</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="panel panel-results" aria-labelledby="result-title">
+                <div class="panel-header">
+                    <h2 id="result-title" class="panel-title">
+                        <span class="panel-icon" aria-hidden="true">📊</span>
+                        ผลเปรียบเทียบ
+                    </h2>
+                    <div class="toolbar">
+                        <button id="shareLinkBtn" class="ghost-btn" type="button">
+                            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                            </svg>
+                            แชร์ลิงก์
+                        </button>
+                        <button id="shareImageBtn" class="ghost-btn" type="button">
+                            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                <circle cx="8.5" cy="8.5" r="1.5" />
+                                <polyline points="21 15 16 10 5 21" />
+                            </svg>
+                            แชร์รูป
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <p id="shareMessage" class="share-message" aria-live="polite" hidden></p>
+                <div class="search-bar">
+                    <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <input id="searchInput" type="search" placeholder="ค้นหาชื่อสินค้า…" aria-label="ค้นหารายการ" />
+                </div>
 
-            <div id="summary" class="summary"></div>
+                <p id="shareMessage" class="toast-msg" aria-live="polite" hidden></p>
+                <div id="summary" class="summary-strip"></div>
 
-            <div class="table-wrap table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th>สินค้า</th>
-                            <th>ราคา</th>
-                            <th>จำนวน</th>
-                            <th>บาท/หน่วย</th>
-                            <th>สถานะ</th>
-                            <th>จัดการ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="resultBody"></tbody>
-                </table>
-            </div>
-        </section>
-    </main>
+                <div class="table-container">
+                    <table class="compare-table">
+                        <thead>
+                            <tr>
+                                <th>สินค้า</th>
+                                <th>ราคา</th>
+                                <th>จำนวน</th>
+                                <th>บาท/หน่วย</th>
+                                <th>สถานะ</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultBody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <span>ProductCompare</span>
+            <span class="footer-dot">·</span>
+            <span id="footerVersion">v2.0.0</span>
+            <span class="footer-dot">·</span>
+            <span>เครื่องมือเปรียบเทียบราคาสินค้า</span>
+        </footer>
+    </div>
 
     <template id="emptyTemplate">
         <tr>
-            <td colspan="6" class="empty-state text-center py-4">
-                ยังไม่มีรายการเปรียบเทียบ เพิ่มอย่างน้อย 2 รายการเพื่อดูว่าราคาไหนคุ้มกว่า
+            <td colspan="6" class="empty-state">
+                <div class="empty-icon" aria-hidden="true">📦</div>
+                <p>ยังไม่มีรายการเปรียบเทียบ</p>
+                <p class="empty-hint">เพิ่มอย่างน้อย 2 รายการเพื่อดูผลเปรียบเทียบ</p>
             </td>
         </tr>
     </template>

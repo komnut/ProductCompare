@@ -1,3 +1,4 @@
+const APP_VERSION = "2.0.0";
 const STORAGE_KEY = "product-compare-items-v2";
 const THEME_KEY = "product-compare-theme-v1";
 
@@ -9,11 +10,15 @@ const sampleBtn = document.getElementById("sampleBtn");
 const searchInput = document.getElementById("searchInput");
 const emptyTemplate = document.getElementById("emptyTemplate");
 const themeToggle = document.getElementById("themeToggle");
+const themeIconSun = document.getElementById("themeIconSun");
+const themeIconMoon = document.getElementById("themeIconMoon");
 const themeColorMeta = document.getElementById("themeColorMeta");
 const formError = document.getElementById("formError");
 const shareMessage = document.getElementById("shareMessage");
 const shareLinkBtn = document.getElementById("shareLinkBtn");
 const shareImageBtn = document.getElementById("shareImageBtn");
+const versionBadge = document.getElementById("versionBadge");
+const footerVersion = document.getElementById("footerVersion");
 const productInput = document.getElementById("product");
 const priceInput = document.getElementById("price");
 const amountInput = document.getElementById("amount");
@@ -28,6 +33,7 @@ if ("serviceWorker" in navigator) {
 }
 
 initTheme();
+displayVersion();
 hydrateItemsFromUrl();
 
 render();
@@ -177,7 +183,7 @@ function render() {
                 }
           </td>
                     <td>
-                        <button class="btn btn-outline-danger btn-sm delete-btn" type="button" data-id="${item.id}">ลบ</button>
+                        <button class="delete-btn" type="button" data-id="${item.id}">ลบ</button>
           </td>
         </tr>
       `;
@@ -373,7 +379,7 @@ function generateComparisonImage(rows) {
     ctx.font = "700 40px 'Noto Sans Thai', sans-serif";
     ctx.fillText("ProductCompare", 68, 78);
     ctx.font = "500 24px 'Noto Sans Thai', sans-serif";
-    ctx.fillText("ผลเปรียบเทียบราคาต่อหน่วย", 68, 115);
+    ctx.fillText(`ผลเปรียบเทียบราคาต่อหน่วย · v${APP_VERSION}`, 68, 115);
 
     const tableTop = 156;
     ctx.fillStyle = "#6a5047";
@@ -558,7 +564,6 @@ function initTheme() {
 
 function applyTheme(theme, shouldPersist = true) {
     document.documentElement.dataset.theme = theme;
-    document.documentElement.setAttribute("data-bs-theme", theme);
 
     if (shouldPersist) {
         localStorage.setItem(THEME_KEY, theme);
@@ -567,12 +572,16 @@ function applyTheme(theme, shouldPersist = true) {
     const isDark = theme === "dark";
 
     if (themeToggle) {
-        themeToggle.textContent = isDark ? "โหมดสว่าง" : "โหมดมืด";
         themeToggle.setAttribute("aria-pressed", String(isDark));
     }
 
+    if (themeIconSun && themeIconMoon) {
+        themeIconSun.style.display = isDark ? "none" : "inline-block";
+        themeIconMoon.style.display = isDark ? "inline-block" : "none";
+    }
+
     if (themeColorMeta) {
-        themeColorMeta.setAttribute("content", isDark ? "#2f2521" : "#FFDCDC");
+        themeColorMeta.setAttribute("content", isDark ? "#241d1a" : "#FFDCDC");
     }
 }
 
@@ -594,4 +603,10 @@ async function disableServiceWorkerCaching() {
     } catch {
         // Ignore cleanup failure to avoid impacting normal app usage.
     }
+}
+
+function displayVersion() {
+    const label = `v${APP_VERSION}`;
+    if (versionBadge) versionBadge.textContent = label;
+    if (footerVersion) footerVersion.textContent = label;
 }

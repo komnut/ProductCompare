@@ -1,0 +1,26 @@
+{
+    "name": "ProductCompare",
+    "short_name": "PCompare",
+    "description": "เว็บเปรียบเทียบราคาสินค้าแบบเร็วสำหรับใช้งานตอนเดินซื้อของ",
+    "lang": "th",
+    "start_url": "./",
+    "scope": "./",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#FFF2EB",
+    "theme_color": "#FFDCDC",
+    "icons": [
+        {
+            "src": "icon-192.svg",
+            "sizes": "192x192",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "icon-512.svg",
+            "sizes": "512x512",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ]
+}

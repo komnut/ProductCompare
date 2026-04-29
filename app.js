@@ -329,3 +329,32 @@ function escapeHtml(value) {
 
     return String(value).replace(/[&<>"']/g, (char) => map[char]);
 }
+
+// ── Theme switcher ──
+const THEMES = ["warm", "ocean", "forest", "berry", "midnight"];
+const THEME_KEY = "product-compare-theme";
+
+function initTheme() {
+    const saved = localStorage.getItem(THEME_KEY);
+    if (saved && THEMES.includes(saved)) {
+        document.documentElement.setAttribute("data-theme", saved);
+    }
+}
+
+initTheme();
+
+const themeBtn = document.getElementById("themeBtn");
+if (themeBtn) {
+    themeBtn.addEventListener("click", () => {
+        const current = document.documentElement.getAttribute("data-theme") || THEMES[0];
+        const nextIndex = (THEMES.indexOf(current) + 1) % THEMES.length;
+        const next = THEMES[nextIndex];
+
+        document.documentElement.setAttribute("data-theme", next);
+        localStorage.setItem(THEME_KEY, next);
+
+        themeBtn.classList.remove("spin");
+        void themeBtn.offsetWidth;
+        themeBtn.classList.add("spin");
+    });
+}

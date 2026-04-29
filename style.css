@@ -1,6 +1,8 @@
 /* ===== ProductCompare — mobile-first single-row ===== */
 
-:root {
+/* ── Theme: Warm (default) ── */
+:root,
+[data-theme="warm"] {
     --bg: #f5f0eb;
     --surface: #ffffff;
     --surface-alt: #faf7f4;
@@ -19,6 +21,79 @@
     --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
     --shadow: 0 4px 16px rgba(47, 33, 25, 0.07);
     --transition: 200ms ease;
+    --theme-dot: #d8652d;
+}
+
+/* ── Theme: Ocean ── */
+[data-theme="ocean"] {
+    --bg: #eef3f8;
+    --surface: #ffffff;
+    --surface-alt: #f5f8fb;
+    --ink: #1a2332;
+    --muted: #6b7d8e;
+    --border: #d0dce6;
+    --primary: #2978b5;
+    --primary-strong: #1f5f8f;
+    --danger: #c0423a;
+    --danger-bg: #fff0ef;
+    --best-bg: #e8f4fd;
+    --best-border: #7bbce6;
+    --best-badge: #1a6da0;
+    --theme-dot: #2978b5;
+}
+
+/* ── Theme: Forest ── */
+[data-theme="forest"] {
+    --bg: #edf2ec;
+    --surface: #ffffff;
+    --surface-alt: #f4f7f3;
+    --ink: #1a2418;
+    --muted: #6d806a;
+    --border: #cddaca;
+    --primary: #3d8b37;
+    --primary-strong: #2d6e28;
+    --danger: #c0423a;
+    --danger-bg: #fff0ef;
+    --best-bg: #eaf5e8;
+    --best-border: #8dc484;
+    --best-badge: #2d7a26;
+    --theme-dot: #3d8b37;
+}
+
+/* ── Theme: Berry ── */
+[data-theme="berry"] {
+    --bg: #f4edf5;
+    --surface: #ffffff;
+    --surface-alt: #f9f5fa;
+    --ink: #211728;
+    --muted: #8a7090;
+    --border: #ddd0e2;
+    --primary: #8e44ad;
+    --primary-strong: #713690;
+    --danger: #c0423a;
+    --danger-bg: #fff0ef;
+    --best-bg: #f3e8f8;
+    --best-border: #c490d6;
+    --best-badge: #7a3599;
+    --theme-dot: #8e44ad;
+}
+
+/* ── Theme: Midnight ── */
+[data-theme="midnight"] {
+    --bg: #1a1d23;
+    --surface: #252830;
+    --surface-alt: #2a2d36;
+    --ink: #e4e6eb;
+    --muted: #8b8f9a;
+    --border: #3a3d47;
+    --primary: #f0913a;
+    --primary-strong: #d97c28;
+    --danger: #e05550;
+    --danger-bg: #3a2220;
+    --best-bg: #2e2a1f;
+    --best-border: #a08030;
+    --best-badge: #f0a830;
+    --theme-dot: #f0913a;
 }
 
 *,
@@ -49,8 +124,13 @@ body {
 
 /* ── Header ── */
 .top-header {
-    text-align: center;
     margin-bottom: 12px;
+}
+
+.header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .top-header h1 {
@@ -65,6 +145,48 @@ body {
     margin: 2px 0 0;
     color: var(--muted);
     font-size: 0.78rem;
+}
+
+/* ── Theme button ── */
+.theme-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    color: var(--primary);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: transform 250ms ease, border-color var(--transition), background var(--transition);
+    flex-shrink: 0;
+}
+
+.theme-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+    pointer-events: none;
+}
+
+.theme-btn:hover {
+    border-color: var(--primary);
+}
+
+.theme-btn:active {
+    transform: scale(0.9) rotate(72deg);
+}
+
+.theme-btn.spin {
+    animation: themeSpin 400ms ease;
+}
+
+@keyframes themeSpin {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(0.85); }
+    100% { transform: rotate(360deg) scale(1); }
 }
 
 /* ── Main ── */
@@ -182,7 +304,7 @@ body {
     padding: 0 10px;
     border-radius: var(--radius-sm);
     border: 1.5px solid var(--border);
-    background: #fff;
+    background: var(--surface);
     color: var(--ink);
     font-family: inherit;
     font-size: 16px;

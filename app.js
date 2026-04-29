@@ -2,7 +2,6 @@ const STORAGE_KEY = "product-compare-simple-rows-v1";
 const MIN_ROWS = 2;
 
 const rowsContainer = document.getElementById("rowsContainer");
-const resultsContainer = document.getElementById("resultsContainer");
 const errorMessage = document.getElementById("errorMessage");
 const addRowBtn = document.getElementById("addRowBtn");
 const clearScreenBtn = document.getElementById("clearScreenBtn");
@@ -58,13 +57,13 @@ rowsContainer.addEventListener("input", (event) => {
     });
 
     persistRows();
-    renderResults();
+    updateHighlights();
     renderErrorHint();
 });
 
 rowsContainer.addEventListener("click", (event) => {
     const target = event.target;
-    if (!(target instanceof HTMLElement)) {
+    if (!(target instanceof Element)) {
         return;
     }
 
@@ -97,7 +96,7 @@ function createRow() {
 
 function renderAll() {
     renderRows();
-    renderResults();
+    updateHighlights();
     renderErrorHint();
     persistRows();
 }
@@ -108,6 +107,7 @@ function renderRows() {
             <span>ชื่อ</span>
             <span>ปริมาณ</span>
             <span>ราคา</span>
+            <span></span>
         </div>
     `;
 
@@ -116,7 +116,7 @@ function renderRows() {
             const disableDelete = rows.length <= MIN_ROWS;
 
             return `
-                <article class="item-row">
+                <article class="item-row" data-card-id="${row.id}">
                     <div class="row-fields">
                         <div class="field">
                             <input
@@ -130,7 +130,6 @@ function renderRows() {
                                 value="${escapeHtml(row.name)}"
                             />
                         </div>
-
                         <div class="field">
                             <input
                                 id="amount-${row.id}"
@@ -145,7 +144,6 @@ function renderRows() {
                                 value="${escapeHtml(row.amount)}"
                             />
                         </div>
-
                         <div class="field">
                             <input
                                 id="price-${row.id}"
@@ -173,6 +171,7 @@ function renderRows() {
                             <path fill-rule="evenodd" d="M9 3a1 1 0 0 0-.894.553L7.382 5H4a1 1 0 1 0 0 2h.293l.88 12.332A2 2 0 0 0 7.168 21h9.664a2 2 0 0 0 1.995-1.668L19.707 7H20a1 1 0 1 0 0-2h-3.382l-.724-1.447A1 1 0 0 0 15 3H9zm2 6a1 1 0 1 0-2 0v8a1 1 0 1 0 2 0V9zm4 0a1 1 0 1 0-2 0v8a1 1 0 1 0 2 0V9z" clip-rule="evenodd" />
                         </svg>
                     </button>
+                    <div class="row-unit-price" data-unit-id="${row.id}"></div>
                 </article>
             `;
         })
@@ -181,7 +180,7 @@ function renderRows() {
     rowsContainer.innerHTML = `${header}${body}`;
 }
 
-function getValidRows() {
+function getValidEntries() {
     return rows
         .map((row) => {
             const name = String(row.name || "").trim();
@@ -200,45 +199,55 @@ function getValidRows() {
                 unitPrice: price / amount,
             };
         })
-        .filter(Boolean)
-        .sort((a, b) => a.unitPrice - b.unitPrice);
+        .filter(Boolean);
 }
 
-function renderResults() {
-    const validRows = getValidRows();
+function updateHighlights() {
+    const entries = getValidEntries();
 
-    if (!validRows.length) {
-        lastBestRowId = null;
-        resultsContainer.innerHTML = '<p class="result-empty">กรอกข้อมูลอย่างน้อย 1 รายการเพื่อเริ่มคำนวณ</p>';
-        return;
+    // Find cheapest
+    let cheapest = null;
+    for (const entry of entries) {
+        if (!cheapest || entry.unitPrice < cheapest.unitPrice) {
+            cheapest = entry;
+        }
     }
 
-    const cheapest = validRows[0];
-    const shouldAnimateBest = Boolean(lastBestRowId && cheapest.id !== lastBestRowId);
+    const shouldAnimate = entries.length >= 2 && cheapest && lastBestRowId && cheapest.id !== lastBestRowId;
 
-    resultsContainer.innerHTML = validRows
-        .map((item, index) => {
-            const rank = index + 1;
-            const isBest = rank === 1;
-            const diffPerPack = Math.max(0, (item.unitPrice - cheapest.unitPrice) * item.amount);
-            const diffPercent = cheapest.unitPrice > 0 ? ((item.unitPrice - cheapest.unitPrice) / cheapest.unitPrice) * 100 : 0;
+    // Update each row
+    for (const row of rows) {
+        const card = document.querySelector(`[data-card-id="${row.id}"]`);
+        const unitEl = document.querySelector(`[data-unit-id="${row.id}"]`);
+        if (!card || !unitEl) continue;
 
-            return `
-                <article class="result-card ${isBest ? "rank-1" : "rank-2"} ${isBest && shouldAnimateBest ? "best-flash" : ""}">
-                    <span class="result-badge">${isBest ? "อันดับ 1 ถูกที่สุด" : `อันดับ ${rank}`}</span>
-                    <h3 class="result-name">${escapeHtml(item.name)}</h3>
-                    <p class="result-meta">ราคา ${formatCurrency(item.price)} | ปริมาณ ${formatNumber(item.amount)}</p>
-                    <p class="result-unit">${formatCurrency(item.unitPrice)} / หน่วย</p>
-                    ${isBest
-                        ? ""
-                        : `<p class="result-diff">แพงกว่า ${formatCurrency(diffPerPack)} ต่อแพ็ก (${formatNumber(diffPercent)}%)</p>`
-                    }
-                </article>
-            `;
-        })
-        .join("");
+        const entry = entries.find((e) => e.id === row.id);
+        const isCheapest = cheapest && entries.length >= 2 && entry && entry.id === cheapest.id;
 
-    lastBestRowId = cheapest.id;
+        // Toggle highlight class
+        card.classList.toggle("is-cheapest", Boolean(isCheapest));
+        card.classList.remove("best-flash");
+        if (isCheapest && shouldAnimate) {
+            void card.offsetWidth;
+            card.classList.add("best-flash");
+        }
+
+        // Show unit price
+        if (entry) {
+            const diff = cheapest && entry.id !== cheapest.id
+                ? `<span class="row-diff">+${formatCurrency((entry.unitPrice - cheapest.unitPrice) * entry.amount)}</span>`
+                : "";
+            unitEl.innerHTML = `<span class="row-unit-label">ต่อหน่วย</span> <span class="row-unit-value">${formatCurrency(entry.unitPrice)}</span>${diff}`;
+            unitEl.classList.add("visible");
+        } else {
+            unitEl.innerHTML = "";
+            unitEl.classList.remove("visible");
+        }
+    }
+
+    if (cheapest) {
+        lastBestRowId = cheapest.id;
+    }
 }
 
 function renderErrorHint() {

@@ -44,29 +44,17 @@
         </header>
 
         <main class="main-stack">
-            <section class="panel" aria-labelledby="entryTitle">
-                <div class="panel-head">
-                    <h2 id="entryTitle">รายการสินค้า</h2>
-                </div>
+            <p id="errorMessage" class="error-message" aria-live="polite" hidden></p>
 
-                <p id="errorMessage" class="error-message" aria-live="polite" hidden></p>
+            <div id="rowsContainer" class="rows-container" aria-label="รายการสินค้า"></div>
 
-                <div id="rowsContainer" class="rows-container" aria-label="รายการอินพุต"></div>
-
-                <div class="action-row">
-                    <button id="addRowBtn" class="btn btn-primary" type="button">เพิ่ม</button>
-                </div>
-
-                <button id="clearScreenBtn" class="btn btn-danger" type="button">เคลียร์หน้าจอ</button>
-            </section>
-
-            <section class="panel" aria-labelledby="resultTitle">
-                <div class="panel-head">
-                    <h2 id="resultTitle">รายการที่ถูกที่สุด</h2>
-                </div>
-
-                <div id="resultsContainer" class="results-container"></div>
-            </section>
+            <div class="action-bar">
+                <button id="addRowBtn" class="btn btn-add" type="button">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2h-6v6a1 1 0 1 1-2 0v-6H5a1 1 0 1 1 0-2h6V5a1 1 0 0 1 1-1z"/></svg>
+                    เพิ่มรายการ
+                </button>
+                <button id="clearScreenBtn" class="btn btn-clear" type="button">เคลียร์</button>
+            </div>
         </main>
     </div>
 

@@ -56,12 +56,6 @@ python3 -m http.server 5500
 - เมื่อโหลดหน้าใหม่ ระบบจะลบข้อมูลคีย์นี้และเริ่มจากข้อมูลว่างเสมอ
 - ฟังก์ชัน persistRows เป็น no-op โดยตั้งใจ (ไม่บันทึกข้อมูล)
 
-## Service Worker และ Cache
-
-- มีไฟล์ service-worker.js เพื่อยกเลิก service worker เดิมและล้าง cache เก่า
-- โค้ดฝั่งหน้าเว็บเวอร์ชันนี้ไม่ได้ลงทะเบียน service worker ใหม่
-- จุดประสงค์หลักคือช่วยเคลียร์สถานะ cache/service worker ที่อาจค้างจากเวอร์ชันก่อน
-
 ## Deploy บน GitHub Pages
 
 โปรเจกต์นี้เป็น static web app จึง deploy ได้ทันทีจาก branch
@@ -78,6 +72,5 @@ python3 -m http.server 5500
 - style.css: ธีม, responsive layout, และสไตล์ทั้งหมด
 - app.js: ตรรกะจัดการแถวสินค้า, คำนวณราคาต่อหน่วย, ไฮไลต์แถวคุ้มสุด, และสลับธีม
 - manifest.webmanifest: ข้อมูล web app manifest และไอคอน
-- service-worker.js: โค้ดยกเลิก service worker เก่าและล้าง cache
 - icon-192.svg: ไอคอนแอปขนาด 192
 - icon-512.svg: ไอคอนแอปขนาด 512

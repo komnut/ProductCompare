@@ -9,6 +9,13 @@ const clearScreenBtn = document.getElementById("clearScreenBtn");
 let rows = loadRows();
 let lastBestRowId = null;
 
+// Always start fresh on a new page load; remove previously persisted rows.
+try {
+    localStorage.removeItem(STORAGE_KEY);
+} catch {
+    // Ignore storage errors and continue with in-memory rows.
+}
+
 renderAll();
 
 addRowBtn.addEventListener("click", () => {
@@ -273,35 +280,11 @@ function renderErrorHint() {
 }
 
 function loadRows() {
-    try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        const parsed = raw ? JSON.parse(raw) : [];
-
-        if (!Array.isArray(parsed)) {
-            return [createRow(), createRow()];
-        }
-
-        const normalized = parsed
-            .filter((item) => item && typeof item === "object")
-            .map((item) => ({
-                id: String(item.id || crypto.randomUUID()),
-                name: String(item.name || ""),
-                amount: String(item.amount || ""),
-                price: String(item.price || ""),
-            }));
-
-        while (normalized.length < MIN_ROWS) {
-            normalized.push(createRow());
-        }
-
-        return normalized;
-    } catch {
-        return [createRow(), createRow()];
-    }
+    return [createRow(), createRow()];
 }
 
 function persistRows() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(rows));
+    // Intentionally no-op: do not persist product rows across page loads.
 }
 
 function formatCurrency(value) {
@@ -332,13 +315,9 @@ function escapeHtml(value) {
 
 // ── Theme switcher ──
 const THEMES = ["warm", "ocean", "forest", "berry", "midnight"];
-const THEME_KEY = "product-compare-theme";
 
 function initTheme() {
-    const saved = localStorage.getItem(THEME_KEY);
-    if (saved && THEMES.includes(saved)) {
-        document.documentElement.setAttribute("data-theme", saved);
-    }
+    document.documentElement.setAttribute("data-theme", THEMES[0]);
 }
 
 initTheme();
@@ -351,7 +330,6 @@ if (themeBtn) {
         const next = THEMES[nextIndex];
 
         document.documentElement.setAttribute("data-theme", next);
-        localStorage.setItem(THEME_KEY, next);
 
         themeBtn.classList.remove("spin");
         void themeBtn.offsetWidth;
